@@ -7,12 +7,15 @@ package com.mycompany.ftp.project.a1;
 
 import com.sun.xml.internal.ws.util.StringUtils;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +78,7 @@ public class FTP_Client extends javax.swing.JFrame {
         setTitle("Connect");
         setAlwaysOnTop(true);
 
-        jTextField1.setText("10.141.23.108");
+        jTextField1.setText("192.168.0.4");
 
         jLabel1.setText("IP");
 
@@ -117,6 +120,7 @@ public class FTP_Client extends javax.swing.JFrame {
         jScrollPane1.setViewportView(jTable1);
 
         jButton2.setText("Download");
+        jButton2.setEnabled(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -124,8 +128,15 @@ public class FTP_Client extends javax.swing.JFrame {
         });
 
         jButton3.setText("Upload");
+        jButton3.setEnabled(false);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Reload");
+        jButton4.setEnabled(false);
         jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton4ActionPerformed(evt);
@@ -143,20 +154,22 @@ public class FTP_Client extends javax.swing.JFrame {
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton3)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton4)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 853, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton4))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 843, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
@@ -168,14 +181,14 @@ public class FTP_Client extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(jButton4))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4))
+                    .addComponent(jButton3))
                 .addContainerGap(225, Short.MAX_VALUE))
         );
 
@@ -194,11 +207,14 @@ public class FTP_Client extends javax.swing.JFrame {
         JTextField username = new JTextField("ftp-user");
         JTextField pass = new JTextField("1234");
         JPanel panel = new JPanel(new GridLayout(0, 1));
+       
         panel.add(new JLabel("Username"));
         panel.add(username);
         panel.add(new JLabel("Pasword"));
         panel.add(pass);
         panel.setVisible(true);
+         
+        
         int result = JOptionPane.showConfirmDialog(null, panel, "Đăng nhập",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
@@ -222,27 +238,66 @@ public class FTP_Client extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
          JPanel panel = new JPanel(new GridLayout(0, 1));
+         int row = jTable1.getSelectedRow();
+         
+         if (jTable1.getSelectedRow() == -1) {
+             alterErorr("Hãy chọn một tệp tin!");
+             return;
+         }
          
          final JFileChooser fileChooser = new JFileChooser();
          fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         
          panel.add(fileChooser, BorderLayout.CENTER);
-      
+
+ 
+         String nameFile = jTable1.getValueAt(row, 0).toString();
+         
          fileChooser.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent e) {
               if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
-                  int row = jTable1.getSelectedRow();
-                  String nameFile = jTable1.getValueAt(row, 0).toString();
-                  fileChooser.getSelectedFile();
-                  downloadFile("/", nameFile, fileChooser.getSelectedFile().getAbsolutePath());
-                          
+                  fileChooser.getSelectedFile().getAbsolutePath();         
               }
            }
          });
          
-        JOptionPane.showConfirmDialog(null, panel, "Chọn đường dẫn", JOptionPane.CLOSED_OPTION, JOptionPane.INFORMATION_MESSAGE);
-
+       
+        
+        int result =  JOptionPane.showConfirmDialog(null, panel, "Chọn đường dẫn", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                downloadFile(DIRECTORY, nameFile, fileChooser.getSelectedFile().getAbsolutePath());
+            } catch (Exception ex) {
+                alterErorr("Chưa chọn đường dẫn lưu file!");
+                ex.printStackTrace();
+            }
+        }  
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+         final JFileChooser fileChooser = new JFileChooser();
+         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+         JPanel panel = new JPanel(new GridLayout(0, 1));
+         panel.add(fileChooser, BorderLayout.CENTER);
+ 
+         fileChooser.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent e) {
+              if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
+                  fileChooser.getSelectedFile().getAbsolutePath();         
+              }
+           }
+         });
+         
+         int result =  JOptionPane.showConfirmDialog(null, panel, "Chọn đường dẫn", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                uploadFile(fileChooser.getSelectedFile().getName().toString(), fileChooser.getSelectedFile().getCanonicalPath());
+            } catch (Exception ex) {
+                alterErorr("Chưa chọn đường dẫn lưu file!");
+                ex.printStackTrace();
+            }
+        }  
+    }//GEN-LAST:event_jButton3ActionPerformed
  
     private void downloadFile(String remotePath,String nameFile, String saveDir) {
          try {
@@ -251,6 +306,27 @@ public class FTP_Client extends javax.swing.JFrame {
                boolean success = ftpClient.retrieveFile(remotePath +"\\"+ nameFile, outputStream1);
                outputStream1.close();
                alterErorr("Tải thành công");
+        } catch (Exception ex) {
+               ex.printStackTrace();
+               alterErorr("Tải file thất bại");
+        } 
+
+    }
+    
+      private void uploadFile(String nameFile, String saveDir) {
+         try {
+               File firstLocalFile = new File(saveDir);
+ 
+     
+               InputStream inputStream = new FileInputStream(firstLocalFile);
+
+               System.out.println("Start uploading first file");
+               boolean done = ftpClient.storeFile(nameFile, inputStream);
+               inputStream.close();
+               if (done) {
+                   alterErorr("Tải file thành công");
+                   showListFile();
+               }
         } catch (Exception ex) {
                ex.printStackTrace();
                alterErorr("Tải file thất bại");
@@ -283,6 +359,10 @@ public class FTP_Client extends javax.swing.JFrame {
             isLogin = true;
             ftpClient.enterLocalPassiveMode();
             showListFile();
+            
+            jButton2.setEnabled(true);
+            jButton3.setEnabled(true);
+            jButton4.setEnabled(true);
         } catch (Exception ex) {
             throw new Exception("I/O error: "+ ex.getMessage());
         }
@@ -290,7 +370,7 @@ public class FTP_Client extends javax.swing.JFrame {
     
     private void showListFile() throws IOException {
         if(!isLogin) return;
-        FTPFile[] files1 = ftpClient.listFiles("/");
+        FTPFile[] files1 = ftpClient.listFiles(DIRECTORY);
         printFileDetails(files1);
     }
     
@@ -306,13 +386,20 @@ public class FTP_Client extends javax.swing.JFrame {
             if (file.isDirectory()) nameFile = "[" + nameFile + "]";
             double size = Math.ceil((double) file.getSize() / 1000);
             String timeCreate = dateFormater.format(file.getTimestamp().getTime());
-            String category = file.getGroup();
+            String category = DIRECTORY;
             String userCreate = file.getUser();
-            String typeFile = file.isDirectory() ? "Directory" : "File";
+            String typeFile = getTypeFileByName(file, nameFile);
             
             model.addRow(new Object[]{nameFile, typeFile, category, timeCreate, size + " (kb)", userCreate});     
         }
         this.jTable1.setModel(model);
+    }
+     
+    private String getTypeFileByName(FTPFile file, String nameFile) {
+        if (file.isFile()) {
+            return nameFile.substring(nameFile.length() - 4 , nameFile.length());
+        }
+        return "Directory";
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -329,6 +416,8 @@ public class FTP_Client extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     private FTPClient ftpClient = new FTPClient();
     private boolean isLogin = false;
+    private static final String DIRECTORY = "/";
+   
  
 
   
