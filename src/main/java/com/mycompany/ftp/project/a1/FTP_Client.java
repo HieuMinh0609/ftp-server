@@ -5,12 +5,8 @@
  */
 package com.mycompany.ftp.project.a1;
 
-import com.sun.xml.internal.ws.util.StringUtils;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.LayoutManager;
-import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
@@ -22,19 +18,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -76,9 +65,10 @@ public class FTP_Client extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Connect");
-        setAlwaysOnTop(true);
+        setAutoRequestFocus(false);
 
-        jTextField1.setText("192.168.0.4");
+        jTextField1.setText("10.141.23.108");
+        jTextField1.setToolTipText("");
 
         jLabel1.setText("IP");
 
